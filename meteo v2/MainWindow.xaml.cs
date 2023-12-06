@@ -22,47 +22,72 @@ namespace meteo_v2
     /// </summary>
     public partial class MainWindow : Window
     {
+        string ville = "Annecy";
+
+        public List<string> Cities { get; set; }
+
         public MainWindow()
         {
             InitializeComponent();
-        _: GetWeather();
+            _: GetWeather(ville);
+
+            Cities = new List<string>
+            {
+                "Annecy", "Marseille", "Lille", "Lyon",
+                "Toulouse", "Clarafond-Arcine", "Angers",
+                "Bordeaux", "Strasbourg", "Nice", "Cannes",
+                "Calais", "Lorient", "Versailles", "Roubaix",
+
+
+            };
+
+            //Ajout des villes au ComboBox
+            foreach (var city in Cities)
+            {
+                CityChoiceCB.Items.Add(city);
+            }
         }
-        public async Task<string> GetWeather()
+        public async Task<string> GetWeather(string ville)
         {
             HttpClient client = new HttpClient();
             try
             {
-                HttpResponseMessage reponse = await client.GetAsync("https://www.prevision-meteo.ch/services/json/Annecy");
+                HttpResponseMessage reponse = await client.GetAsync("https://www.prevision-meteo.ch/services/json/" + ville);
                 if (reponse.IsSuccessStatusCode)
                 {
                     var content = await reponse.Content.ReadAsStringAsync();
                     Root root = JsonConvert.DeserializeObject<Root>(content);
-                    CurrentCondition current_condition = root.current_condition;
+                    CurrentCondition currentCondition = root.current_condition;
                     FcstDay1 fcst_day_1 = root.fcst_day_1;
                     FcstDay2 fcst_day_2 = root.fcst_day_2;
                     FcstDay3 fcst_day_3 = root.fcst_day_3;
                     FcstDay4 fcst_day_4 = root.fcst_day_4;
-                    temps.Text = "Il fait actuellement " + current_condition.tmp.ToString() + "°C";
-                    ciel.Text =  current_condition.condition.ToString() ;
-                    heure.Text = "il est " + current_condition.hour.ToString();
+
+                    temps.Text = "Il fait actuellement " + currentCondition.tmp.ToString() + "°C";
+                    ciel.Text =  currentCondition.condition.ToString() ;
+                    heure.Text = "il est " + currentCondition.hour.ToString();
+
                     jour.Text = fcst_day_1.date.ToString() ;
                     max.Text = "temps max:" + fcst_day_1.tmax.ToString();
                     min.Text = "temps min:" + fcst_day_1.tmin.ToString();
+
                     jour1.Text = fcst_day_2.date.ToString();
                     max1.Text = "temps max:" + fcst_day_2.tmax.ToString();
                     min1.Text = "temps min:" + fcst_day_2.tmin.ToString();
+
                     jour2.Text = fcst_day_3.date.ToString();
                     min2.Text = "temps min:" + fcst_day_3.tmin.ToString();
                     max2.Text = "temps max:" + fcst_day_3.tmax.ToString();
+
                     jour3.Text = fcst_day_4.date.ToString();
                     max3.Text = "temps max:" + fcst_day_4.tmax.ToString();
                     min3.Text = "temps min:" + fcst_day_4.tmin.ToString();
+
                     Img_Meteo.Source = new BitmapImage(new Uri(fcst_day_1.icon.ToString(), UriKind.RelativeOrAbsolute));
                     Img_Meteo1.Source = new BitmapImage(new Uri(fcst_day_2.icon.ToString(), UriKind.RelativeOrAbsolute));
                     Img_Meteo2.Source = new BitmapImage(new Uri(fcst_day_3.icon.ToString(), UriKind.RelativeOrAbsolute));
                     Img_Meteo3.Source = new BitmapImage(new Uri(fcst_day_4.icon.ToString(), UriKind.RelativeOrAbsolute));
-                    Img_Pendu.Source = new BitmapImage(new Uri(current_condition.icon_big.ToString(), UriKind.RelativeOrAbsolute));
-                    return current_condition.tmp.ToString();
+                    Img_Pendu.Source = new BitmapImage(new Uri(currentCondition.icon_big.ToString(), UriKind.RelativeOrAbsolute));
                     //return weather.description.ToString();
 
                 }
@@ -74,9 +99,48 @@ namespace meteo_v2
             }
             catch (Exception ex)
             {
-                return null;
+                return TB_ADD_CITY.Text = "Ville Introuvable";
             }
             return null;
+        }
+
+        private void CityChoiceCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            TB_ADD_CITY.Text = "";
+            string selectedCity = CityChoiceCB.SelectedItem as string;
+        _: GetWeather(selectedCity);
+        }
+
+        private void BP_SUPPR_Click(object sender, RoutedEventArgs e)
+        {
+            string selectedCity = CityChoiceCB.SelectedItem as string;
+            string villeASupprimer = CityChoiceCB.SelectedItem as string;
+
+            if (!string.IsNullOrEmpty(selectedCity))
+            {
+                CityChoiceCB.Items.Remove(selectedCity);
+                Cities.Remove(villeASupprimer);
+                // Vous pouvez également mettre à jour vos données de sauvegarde ici.
+
+            }
+        }
+
+        private void BP_ADD_CITY_Click(object sender, RoutedEventArgs e)
+        {
+            // Ajoutez le texte de la TextBox à la collection Cities
+            string nouvelleVille = TB_ADD_CITY.Text.Trim();
+
+            if (!string.IsNullOrEmpty(nouvelleVille) && !Cities.Contains(nouvelleVille))
+            {
+                CityChoiceCB.Items.Add(nouvelleVille);
+
+                // Effacez le contenu de la TextBox après avoir ajouté la ville
+                TB_ADD_CITY.Clear();
+            }
+            else
+            {
+                MessageBox.Show("La ville est déjà dans la liste ou le champ est vide.");
+            }
         }
         // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
 
