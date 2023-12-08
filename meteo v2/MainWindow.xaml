@@ -19,7 +19,7 @@
         <Grid Grid.Column ="1" Background="#1f3d7a">
             <ComboBox HorizontalAlignment="Left" Margin="54,15,0,0" VerticalAlignment="Top" Width="120" Name="CityChoiceCB" SelectionChanged="CityChoiceCB_SelectionChanged"/>
             <Button Content="supr" HorizontalAlignment="Left" Margin="238,17,0,0" VerticalAlignment="Top" Name="BP_SUPPR" Click="BP_SUPPR_Click"/>
-            <Button Content="Button" HorizontalAlignment="Left" Margin="305,17,0,0" VerticalAlignment="Top" Name="BP_ADD_CITY" Click="BP_ADD_CITY_Click"/>
+            <Button Content="ajouter" HorizontalAlignment="Left" Margin="305,17,0,0" VerticalAlignment="Top" Name="BP_ADD_CITY" Click="BP_ADD_CITY_Click"/>
             <TextBox HorizontalAlignment="Left" Margin="363,18,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" Name="TB_ADD_CITY"/>
 
         </Grid>
